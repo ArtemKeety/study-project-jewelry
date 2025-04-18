@@ -1,11 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 )
 
 func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println(r.Context().Value("user_id"))
+	fmt.Println(getUser(w, r))
 	w.Write([]byte("Get Products in cart"))
 }
 

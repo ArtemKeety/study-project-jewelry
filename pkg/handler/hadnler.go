@@ -23,6 +23,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 	}
 
 	api := router.PathPrefix("/api").Subrouter()
+	api.Use(h.userIdentity)
 	{
 		product := api.PathPrefix("/product").Subrouter()
 		{
@@ -31,7 +32,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 		}
 
 		cart := api.PathPrefix("/cart").Subrouter()
-		cart.Use(h.userIdentity)
+
 		{
 			cart.HandleFunc("/", h.GetCart).Methods("GET")
 			cart.HandleFunc("/", h.ClearCart).Methods("DELETE")

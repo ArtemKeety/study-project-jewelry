@@ -10,7 +10,9 @@ type Authorization interface {
 	GetUser(login string) (jewelrymodel.User, error)
 }
 
-type Product interface{}
+type Product interface {
+	GetProducts(pages int) ([]jewelrymodel.ProductPreview, error)
+}
 
 type Cart interface{}
 
@@ -23,5 +25,6 @@ type Repository struct {
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthMysql(db),
+		Product:       NewProductMysql(db),
 	}
 }

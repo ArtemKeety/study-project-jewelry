@@ -11,7 +11,9 @@ type Authorization interface {
 	ParseToken(tokenString string) (int, error)
 }
 
-type Product interface{}
+type Product interface {
+	GetProducts(pages int) ([]jewelrymodel.ProductPreview, error)
+}
 
 type Cart interface{}
 
@@ -24,5 +26,6 @@ type Service struct {
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repo.Authorization),
+		Product:       NewProductService(repo.Product),
 	}
 }
