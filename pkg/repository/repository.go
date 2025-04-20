@@ -11,7 +11,8 @@ type Authorization interface {
 }
 
 type Product interface {
-	GetProducts(pages int) ([]jewelrymodel.ProductPreview, error)
+	GetProducts(pages, offset int) ([]jewelrymodel.ProductPreview, error)
+	GetProductById(id int) (jewelrymodel.ProductDetail, error)
 }
 
 type Cart interface{}

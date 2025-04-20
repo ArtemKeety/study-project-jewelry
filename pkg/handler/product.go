@@ -7,23 +7,36 @@ import (
 
 func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 
-	pages, err := getPagination(w, r)
+	limit, offset, err := getPagination(w, r)
 
 	if err != nil {
-		NewCustomError(w, http.StatusUnauthorized, "invalid pagination")
+		NewCustomError(w, http.StatusRequestEntityTooLarge, "invalid pagination")
 	}
 
-	products, err := h.service.Product.GetProducts(pages)
+	products, err := h.service.Product.GetProducts(limit, offset)
 	if err != nil {
 		NewCustomError(w, http.StatusInternalServerError, err.Error())
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-
 	json.NewEncoder(w).Encode(map[string]interface{}{"products": products})
 }
 
 func (h *Handler) GetCurProduct(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Get Products"))
+	id, err := GetId(r)
+	if err != nil {
+		NewCustomError(w, http.StatusNotFound, "Not Found Id")
+		return
+	}
+
+	product, err := h.service.Product.GetProductById(id)
+
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(map[string]interface{}{"product": product})
 }

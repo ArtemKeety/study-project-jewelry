@@ -3,6 +3,8 @@ package handler
 import (
 	"curs/pkg/service"
 	"github.com/gorilla/mux"
+	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -43,6 +45,12 @@ func (h *Handler) InitRoutes() *mux.Router {
 		}
 
 	}
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
 	return router
+}
+
+func GetId(r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+	return strconv.Atoi(vars["Id"])
 }

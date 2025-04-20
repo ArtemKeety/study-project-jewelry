@@ -50,20 +50,23 @@ func getUser(w http.ResponseWriter, r *http.Request) (int, error) {
 	return userId, nil
 }
 
-func getPagination(w http.ResponseWriter, r *http.Request) (int, error) {
+func getPagination(w http.ResponseWriter, r *http.Request) (int, int, error) {
 	type PaginationRequest struct {
-		Paigs int `json:"paigs"`
+		Limit int `json:"limit"`
+		Pages int `json:"pages"`
 	}
 
 	var numPaiges PaginationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&numPaiges); err != nil {
-		return 0, errors.New("invalid pagination")
+		return 0, 0, errors.New("invalid pagination not param limit or pages")
 	}
 
-	if numPaiges.Paigs < 1 {
-		return 0, errors.New("invalid pagination")
+	if numPaiges.Pages < 1 || numPaiges.Limit < 1 || numPaiges.Limit > 100 {
+		return 0, 0, errors.New("invalid pagination")
 	}
 
-	return numPaiges.Paigs, nil
+	offset := (numPaiges.Pages - 1) * numPaiges.Limit
+
+	return numPaiges.Limit, offset, nil
 }
