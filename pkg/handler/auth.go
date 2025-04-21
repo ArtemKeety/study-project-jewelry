@@ -19,10 +19,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		NewCustomError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	json.NewEncoder(w).Encode(map[string]interface{}{"id": id})
+	SendSuccessResponse(w, map[string]interface{}{"id": id})
 }
 
 type LoginUser struct {
@@ -43,8 +40,5 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		NewCustomError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	json.NewEncoder(w).Encode(map[string]interface{}{"token": token})
+	SendSuccessResponse(w, map[string]interface{}{"token": token})
 }

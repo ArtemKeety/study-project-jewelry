@@ -59,10 +59,12 @@ func getPagination(w http.ResponseWriter, r *http.Request) (int, int, error) {
 	var numPaiges PaginationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&numPaiges); err != nil {
-		return 0, 0, errors.New("invalid pagination not param limit or pages")
+		NewCustomError(w, http.StatusBadRequest, err.Error())
+		return 0, 0, err
 	}
 
 	if numPaiges.Pages < 1 || numPaiges.Limit < 1 || numPaiges.Limit > 100 {
+		NewCustomError(w, http.StatusBadRequest, "invalid pagination")
 		return 0, 0, errors.New("invalid pagination")
 	}
 

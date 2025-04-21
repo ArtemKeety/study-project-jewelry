@@ -2,6 +2,7 @@ package handler
 
 import (
 	"curs/pkg/service"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -53,4 +54,12 @@ func (h *Handler) InitRoutes() *mux.Router {
 func GetId(r *http.Request) (int, error) {
 	vars := mux.Vars(r)
 	return strconv.Atoi(vars["Id"])
+}
+
+func SendSuccessResponse(w http.ResponseWriter, data map[string]interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
 }
