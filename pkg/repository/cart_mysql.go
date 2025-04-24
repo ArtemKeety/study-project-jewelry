@@ -26,3 +26,13 @@ func (r *CartMysql) AddInCart(productId, userId int) (int, error) {
 
 	return int(cartId), nil
 }
+
+func (r *CartMysql) CheckInCart(productId, userId int) (int, error) {
+	cartId := -1
+	query := `SELECT c.id FROM cart c WHERE user_id = ? AND tovar_id = ?`
+	if err := r.db.QueryRow(query, userId, productId).Scan(&cartId); err != nil {
+		return cartId, err
+	}
+
+	return cartId, nil
+}

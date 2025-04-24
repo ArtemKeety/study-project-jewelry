@@ -18,6 +18,7 @@ type Product interface {
 
 type Cart interface {
 	AddInCart(productId, userId int) (int, error)
+	CheckInCart(productId, userId int) (int, error)
 }
 
 type Service struct {

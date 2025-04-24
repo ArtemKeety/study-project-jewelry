@@ -11,7 +11,21 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CheckInCart(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("CheckItem in cart"))
+	userId, err := getUser(w, r)
+	if err != nil {
+		NewCustomError(w, http.StatusUnauthorized, err.Error())
+	}
+	productId, err := GetId(r)
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	cartId, err := h.service.Cart.CheckInCart(userId, productId)
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	SendSuccessResponse(w, map[string]interface{}{"cartId": cartId})
 }
 
 func (h *Handler) ClearCart(w http.ResponseWriter, r *http.Request) {
