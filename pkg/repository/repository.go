@@ -15,7 +15,9 @@ type Product interface {
 	GetProductById(id int) (jewelrymodel.ProductDetail, error)
 }
 
-type Cart interface{}
+type Cart interface {
+	AddInCart(productId, userId int) (int, error)
+}
 
 type Repository struct {
 	Authorization
@@ -27,5 +29,6 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthMysql(db),
 		Product:       NewProductMysql(db),
+		Cart:          NewCartMysql(db),
 	}
 }

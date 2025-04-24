@@ -16,7 +16,9 @@ type Product interface {
 	GetProductById(id int) (jewelrymodel.ProductDetail, error)
 }
 
-type Cart interface{}
+type Cart interface {
+	AddInCart(productId, userId int) (int, error)
+}
 
 type Service struct {
 	Authorization
@@ -28,5 +30,6 @@ func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repo.Authorization),
 		Product:       NewProductService(repo.Product),
+		Cart:          NewCartService(repo.Cart),
 	}
 }

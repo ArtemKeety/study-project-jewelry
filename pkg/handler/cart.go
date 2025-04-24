@@ -19,7 +19,23 @@ func (h *Handler) ClearCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AddInCart(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Add In Cart"))
+	userId, err := getUser(w, r)
+	if err != nil {
+		NewCustomError(w, http.StatusUnauthorized, err.Error())
+	}
+
+	productId, err := GetId(r)
+
+	if err != nil {
+		NewCustomError(w, http.StatusNotFound, err.Error())
+	}
+
+	cartId, err := h.service.Cart.AddInCart(productId, userId)
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	SendSuccessResponse(w, map[string]interface{}{"cart_id": cartId})
 }
 
 func (h *Handler) RemoveInCart(w http.ResponseWriter, r *http.Request) {

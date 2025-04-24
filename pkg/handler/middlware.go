@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -35,16 +34,10 @@ func (h *Handler) userIdentity(next http.Handler) http.Handler {
 }
 
 func getUser(w http.ResponseWriter, r *http.Request) (int, error) {
-	id, ok := r.Context().Value("user_id").(string)
+	userId, ok := r.Context().Value("user_id").(int)
 	if !ok {
 		NewCustomError(w, http.StatusUnauthorized, "invalid user id")
-		return 0, errors.New("invalid user id")
-	}
-
-	userId, err := strconv.Atoi(id)
-	if err != nil {
-		NewCustomError(w, http.StatusUnauthorized, "invalid user id")
-		return 0, errors.New("invalid user id")
+		return -1, errors.New("invalid user id")
 	}
 
 	return userId, nil
