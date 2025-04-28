@@ -19,6 +19,7 @@ type Product interface {
 type Cart interface {
 	AddInCart(productId, userId int) (int, error)
 	CheckInCart(productId, userId int) (int, error)
+	GetCart(userId int) ([]jewelrymodel.Cart, error)
 }
 
 type Service struct {

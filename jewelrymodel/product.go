@@ -7,7 +7,7 @@ type Product struct {
 	Description string `json:"description" db:"description"`
 	Material    string `json:"material" db:"material"`
 	TypeProduct int    `json:"type_product" db:"category_id"`
-	Count       int    `json:"count"`
+	Count       int    `json:"count" db:"count"`
 }
 
 type Photo struct {

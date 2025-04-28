@@ -1,13 +1,21 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 )
 
 func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(getUser(w, r))
-	w.Write([]byte("Get Products in cart"))
+	userId, err := getUser(w, r)
+	if err != nil {
+		NewCustomError(w, http.StatusUnauthorized, err.Error())
+	}
+
+	CartList, err := h.service.Cart.GetCart(userId)
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	SendSuccessResponse(w, map[string]interface{}{"cart": CartList})
 }
 
 func (h *Handler) CheckInCart(w http.ResponseWriter, r *http.Request) {

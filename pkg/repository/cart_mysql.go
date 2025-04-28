@@ -1,6 +1,9 @@
 package repository
 
-import "database/sql"
+import (
+	"curs/jewelrymodel"
+	"database/sql"
+)
 
 type CartMysql struct {
 	db *sql.DB
@@ -35,4 +38,48 @@ func (r *CartMysql) CheckInCart(productId, userId int) (int, error) {
 	}
 
 	return cartId, nil
+}
+
+func (r *CartMysql) GetCart(userId int) ([]jewelrymodel.Cart, error) {
+	var carts []jewelrymodel.Cart
+
+	query := `SELECT c.tovar_id, c.id, c.user_id, c.count , p.name,
+		p.price ,p.description , p.count , p.category_id ,
+		p.material , ph.id , ph.filepath , ph.product_id 
+		FROM cart c 
+		JOIN product p on c.tovar_id = p.id 
+		JOIN (
+				SELECT product_id, MIN(id) AS min_id 
+				FROM Photo 
+				GROUP BY product_id
+		) 
+		AS first_photos ON p.id = first_photos.product_id 
+		JOIN Photo ph ON first_photos.min_id = ph.id
+		WHERE user_id = ?`
+
+	rows, err := r.db.Query(query, userId)
+	if err != nil {
+		return carts, err
+	}
+
+	for rows.Next() {
+		var cart jewelrymodel.Cart
+		if err = rows.Scan(
+			&cart.Id, &cart.CartId, &cart.UserId, &cart.CountInCart, &cart.Name,
+			&cart.Price, &cart.Description, &cart.Count, &cart.TypeProduct, &cart.Material,
+			&cart.PreviewPhoto.Id, &cart.PreviewPhoto.Filename, &cart.ProductPreview.Id); err != nil {
+			return carts, err
+		}
+
+		carts = append(carts, cart)
+
+	}
+
+	defer rows.Close()
+
+	if err = rows.Err(); err != nil {
+		return carts, err
+	}
+
+	return carts, nil
 }

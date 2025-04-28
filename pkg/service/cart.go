@@ -1,6 +1,7 @@
 package service
 
 import (
+	"curs/jewelrymodel"
 	"curs/pkg/repository"
 	"errors"
 )
@@ -22,4 +23,8 @@ func (s *CartService) AddInCart(productId, userId int) (int, error) {
 
 func (s *CartService) CheckInCart(productId, userId int) (int, error) {
 	return s.repo.CheckInCart(userId, productId)
+}
+
+func (s *CartService) GetCart(userId int) ([]jewelrymodel.Cart, error) {
+	return s.repo.GetCart(userId)
 }

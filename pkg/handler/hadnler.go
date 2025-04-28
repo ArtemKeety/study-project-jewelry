@@ -32,6 +32,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 		{
 			product.HandleFunc("/", h.GetProducts).Methods("GET")
 			product.HandleFunc("/{Id:[0-9]+}", h.GetCurProduct).Methods("GET")
+			product.HandleFunc("/ByCategoryId/{Id:[0-9]+}", h.GetCurProduct).Methods("GET")
 		}
 
 		cart := api.PathPrefix("/cart").Subrouter()
