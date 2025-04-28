@@ -3,6 +3,7 @@ package service
 import (
 	"curs/jewelrymodel"
 	"curs/pkg/repository"
+	"errors"
 )
 
 type ProductService struct {
@@ -19,4 +20,15 @@ func (s *ProductService) GetProducts(pages, offset int) ([]jewelrymodel.ProductP
 
 func (s *ProductService) GetProductById(id int) (jewelrymodel.ProductDetail, error) {
 	return s.repo.GetProductById(id)
+}
+
+func (s *ProductService) GetFilterProduct(id int) ([]jewelrymodel.ProductPreview, error) {
+	if tmp, err := s.repo.CheckCategory(id); err != nil || !tmp {
+		return nil, errors.New("not found category")
+	}
+	return s.repo.GetFilterProduct(id)
+}
+
+func (s *ProductService) CheckCategory(id int) (bool, error) {
+	return s.repo.CheckCategory(id)
 }

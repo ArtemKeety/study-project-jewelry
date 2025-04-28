@@ -35,3 +35,17 @@ func (h *Handler) GetCurProduct(w http.ResponseWriter, r *http.Request) {
 
 	SendSuccessResponse(w, map[string]interface{}{"product": product})
 }
+
+func (h *Handler) GetFilterProduct(w http.ResponseWriter, r *http.Request) {
+	id, err := GetId(r)
+	if err != nil {
+		NewCustomError(w, http.StatusNotFound, "Not Found Id")
+	}
+
+	products, err := h.service.Product.GetFilterProduct(id)
+	if err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	SendSuccessResponse(w, map[string]interface{}{"products": products})
+}

@@ -88,3 +88,49 @@ func (r *ProductMysql) GetProductById(id int) (jewelrymodel.ProductDetail, error
 
 	return product, nil
 }
+
+func (r *ProductMysql) GetFilterProduct(id int) ([]jewelrymodel.ProductPreview, error) {
+	var products []jewelrymodel.ProductPreview
+
+	querry := `SELECT t.id, t.name, t.price, t.description, t.material,
+       		t.category_id, t.count, p.id AS photo_id, p.filepath, p.product_id
+			FROM product t 
+			JOIN (
+				SELECT product_id, MIN(id) AS min_id 
+				FROM Photo 
+				GROUP BY product_id
+				) 
+			AS first_photos ON t.id = first_photos.product_id 
+			JOIN Photo p ON first_photos.min_id = p.id
+			where t.category_id = ?`
+
+	rows, err := r.db.Query(querry, id)
+
+	if err != nil {
+		return products, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var product jewelrymodel.ProductPreview
+		if err = rows.Scan(&product.Id, &product.Name, &product.Price, &product.Description,
+			&product.Material, &product.TypeProduct, &product.Count, &product.PreviewPhoto.Id,
+			&product.PreviewPhoto.Filename, &product.PreviewPhoto.ProductId); err != nil {
+			return products, err
+		}
+		products = append(products, product)
+	}
+
+	return products, nil
+}
+
+func (r *ProductMysql) CheckCategory(id int) (bool, error) {
+	var CatId int
+	query := `SELECT c.id from category c where c.id = ?`
+	if err := r.db.QueryRow(query, id).Scan(&CatId); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
