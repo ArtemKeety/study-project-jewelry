@@ -19,3 +19,11 @@ func NewCustomError(w http.ResponseWriter, code int, message string) {
 		logrus.Errorf("Failed to encode JSON: %v", err)
 	}
 }
+
+func SendSuccessResponse(w http.ResponseWriter, data map[string]interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		NewCustomError(w, http.StatusInternalServerError, err.Error())
+	}
+}
