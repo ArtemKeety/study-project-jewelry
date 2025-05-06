@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	jewelry "curs"
 	"curs/pkg/handler"
 	"curs/pkg/repository"
 	"curs/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
+	"os/signal"
 )
 
 func main() {
@@ -34,8 +37,21 @@ func main() {
 	h := handler.NewHandler(services)
 
 	srv := new(jewelry.Server)
-	if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
-		logrus.Fatalf("error in start server Config %s", err.Error())
+
+	go func() {
+		if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
+			logrus.Fatalf("error in start server Config %s", err.Error())
+		}
+	}()
+
+	logrus.Println("start server")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	if err := srv.ShutDown(context.Background()); err != nil {
+		logrus.Fatalf("error in shutdown Server %s", err.Error())
 	}
 
 }

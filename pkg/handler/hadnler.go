@@ -19,6 +19,8 @@ func NewHandler(service *service.Service) *Handler {
 func (h *Handler) InitRoutes() *mux.Router {
 	router := mux.NewRouter()
 
+	router.Use(h.getLog)
+
 	auth := router.PathPrefix("/auth").Subrouter()
 	{
 		auth.HandleFunc("/sign-in", h.SignIn).Methods("POST")
