@@ -2,6 +2,7 @@ package handler
 
 import (
 	"curs/pkg/service"
+	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -31,7 +32,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 		{
 			product.HandleFunc("/", h.GetProducts).Methods("GET")
 			product.HandleFunc("/{Id:[0-9]+}", h.GetCurProduct).Methods("GET")
-			product.HandleFunc("/ByCategoryId/{Id:[0-9]+}", h.GetFilterProduct).Methods("GET")
+			product.HandleFunc("/by_category_id/{Id:[0-9]+}", h.GetFilterProduct).Methods("GET")
 		}
 
 		cart := api.PathPrefix("/cart").Subrouter()
@@ -52,5 +53,14 @@ func (h *Handler) InitRoutes() *mux.Router {
 
 func GetId(r *http.Request) (int, error) {
 	vars := mux.Vars(r)
-	return strconv.Atoi(vars["Id"])
+	result, err := strconv.Atoi(vars["Id"])
+	if err != nil {
+		return -1, err
+	}
+
+	if result < 1 {
+		return -1, errors.New("invalid id")
+	}
+
+	return result, nil
 }

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -36,32 +35,8 @@ func (h *Handler) userIdentity(next http.Handler) http.Handler {
 func getUser(w http.ResponseWriter, r *http.Request) (int, error) {
 	userId, ok := r.Context().Value("user_id").(int)
 	if !ok {
-		NewCustomError(w, http.StatusUnauthorized, "invalid user id")
 		return -1, errors.New("invalid user id")
 	}
 
 	return userId, nil
-}
-
-func getPagination(w http.ResponseWriter, r *http.Request) (int, int, error) {
-	type PaginationRequest struct {
-		Limit int `json:"limit"`
-		Pages int `json:"pages"`
-	}
-
-	var numPaiges PaginationRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&numPaiges); err != nil {
-		NewCustomError(w, http.StatusBadRequest, err.Error())
-		return 0, 0, err
-	}
-
-	if numPaiges.Pages < 1 || numPaiges.Limit < 1 || numPaiges.Limit > 100 {
-		NewCustomError(w, http.StatusBadRequest, "invalid pagination")
-		return 0, 0, errors.New("invalid pagination")
-	}
-
-	offset := (numPaiges.Pages - 1) * numPaiges.Limit
-
-	return numPaiges.Limit, offset, nil
 }

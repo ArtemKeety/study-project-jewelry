@@ -21,6 +21,9 @@ type Cart interface {
 	AddInCart(productId, userId int) (int, error)
 	CheckInCart(productId, userId int) (int, error)
 	GetCart(userId int) ([]jewelrymodel.Cart, error)
+	RemoveInCart(userId, cartId int) (int, error)
+	UpdateItemCart(request jewelrymodel.CartRequest) (int, error)
+	ClearCart(userId int) (int, error)
 }
 
 type Repository struct {

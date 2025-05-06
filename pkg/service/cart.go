@@ -28,3 +28,15 @@ func (s *CartService) CheckInCart(productId, userId int) (int, error) {
 func (s *CartService) GetCart(userId int) ([]jewelrymodel.Cart, error) {
 	return s.repo.GetCart(userId)
 }
+
+func (s *CartService) RemoveInCart(userId, cartId int) (int, error) {
+	return s.repo.RemoveInCart(userId, cartId)
+}
+
+func (s *CartService) UpdateItemCart(request jewelrymodel.CartRequest) (int, error) {
+	return s.repo.UpdateItemCart(request)
+}
+
+func (s *CartService) ClearCart(userId int) (int, error) {
+	return s.repo.ClearCart(userId)
+}

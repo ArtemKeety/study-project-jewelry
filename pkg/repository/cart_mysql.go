@@ -3,6 +3,7 @@ package repository
 import (
 	"curs/jewelrymodel"
 	"database/sql"
+	"errors"
 )
 
 type CartMysql struct {
@@ -82,4 +83,64 @@ func (r *CartMysql) GetCart(userId int) ([]jewelrymodel.Cart, error) {
 	}
 
 	return carts, nil
+}
+
+func (r *CartMysql) RemoveInCart(userId, cartId int) (int, error) {
+	query := `DELETE FROM cart WHERE user_id = ? AND id = ?`
+	result, err := r.db.Exec(query, userId, cartId)
+	if err != nil {
+		return -1, err
+	}
+	ok, err := result.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+
+	return int(ok), nil
+}
+
+func (r *CartMysql) UpdateItemCart(request jewelrymodel.CartRequest) (int, error) {
+
+	dopQuery := `SELECT p.count
+			FROM cart c
+			JOIN product p ON p.id = c.tovar_id
+	    	WHERE c.id = ?`
+
+	var count int
+	if err := r.db.QueryRow(dopQuery, request.CartId).Scan(&count); err != nil {
+		return -1, err
+	}
+
+	if count < request.CountInCart {
+		return -1, errors.New("product count is less than CountInCart")
+	}
+
+	query := `UPDATE cart SET count = ? WHERE user_id = ? and id = ?`
+
+	result, err := r.db.Exec(query, request.CountInCart, request.UserId, request.CartId)
+	if err != nil {
+		return -1, err
+	}
+
+	ok, err := result.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+
+	return int(ok), nil
+}
+
+func (r *CartMysql) ClearCart(userId int) (int, error) {
+	query := `DELETE FROM cart WHERE user_id = ?`
+	result, err := r.db.Exec(query, userId)
+	if err != nil {
+		return -1, err
+	}
+
+	ok, err := result.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+
+	return int(ok), nil
 }
