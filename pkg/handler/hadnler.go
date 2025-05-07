@@ -4,6 +4,7 @@ import (
 	"curs/pkg/service"
 	"errors"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"strconv"
 )
@@ -20,6 +21,8 @@ func (h *Handler) InitRoutes() *mux.Router {
 	router := mux.NewRouter()
 
 	router.Use(h.getLog)
+
+	router.PathPrefix("/swaggerJewelry/").Handler(httpSwagger.WrapHandler)
 
 	auth := router.PathPrefix("/auth").Subrouter()
 	{

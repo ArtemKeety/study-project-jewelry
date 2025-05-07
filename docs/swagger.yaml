@@ -1,0 +1,625 @@
+basePath: /
+definitions:
+  jewelrymodel.Cart:
+    properties:
+      cart_id:
+        type: integer
+      count:
+        type: integer
+      count_in_cart:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      material:
+        type: string
+      name:
+        type: string
+      preview_photo:
+        $ref: '#/definitions/jewelrymodel.Photo'
+      price:
+        type: integer
+      type_product:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  jewelrymodel.CartRequest:
+    properties:
+      cart_id:
+        type: integer
+      count_in_cart:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  jewelrymodel.LoginUser:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  jewelrymodel.Photo:
+    properties:
+      filename:
+        type: string
+      id:
+        type: integer
+      product_id:
+        type: integer
+    type: object
+  jewelrymodel.ProductDetail:
+    properties:
+      count:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      material:
+        type: string
+      name:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/jewelrymodel.Photo'
+        type: array
+      price:
+        type: integer
+      type_product:
+        type: integer
+    type: object
+  jewelrymodel.ProductPreview:
+    properties:
+      count:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      material:
+        type: string
+      name:
+        type: string
+      preview_photo:
+        $ref: '#/definitions/jewelrymodel.Photo'
+      price:
+        type: integer
+      type_product:
+        type: integer
+    type: object
+  jewelrymodel.User:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      father_name:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server
+  title: TODO APP Jewelry
+  version: "1.0"
+paths:
+  /api/cart/:
+    delete:
+      consumes:
+      - application/json
+      description: Очещине корзины пользователя (требуется авторизация)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Очистить товары в корзине
+      tags:
+      - Cart
+    get:
+      consumes:
+      - application/json
+      description: Получение списка товаров в корзине (требуется авторизация)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список продуктов
+          schema:
+            items:
+              $ref: '#/definitions/jewelrymodel.Cart'
+            type: array
+        "400":
+          description: Некорректный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Неавторизованный доступ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Не найдено данных
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить все товары в корзине
+      tags:
+      - Cart
+  /api/cart/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление товара из коризны по ID(требуется авторизация)
+      parameters:
+      - description: ID обьекта корзины
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Удалить товар из корзины
+      tags:
+      - Cart
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о товаре в коризне по ID товара(требуется
+        авторизация)
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Проверить наличие товара в корзине по ID товара
+      tags:
+      - Cart
+    post:
+      consumes:
+      - application/json
+      description: Добавление товара в коризну по ID(требуется авторизация)
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Добавить товар в корзину
+      tags:
+      - Cart
+    put:
+      consumes:
+      - application/json
+      description: Изменение количества товара в корзине по его ID. Требуется авторизация.
+      parameters:
+      - description: ID объекта корзины
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные корзины (новое количество товара)
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/jewelrymodel.CartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Результат обновления
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Некорректный запрос или значение количества товара меньше 1
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Неавторизованный доступ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Объект корзины не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Редактировать объект в корзине
+      tags:
+      - Cart
+  /api/product/:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка товаров (требуется авторизация)
+      parameters:
+      - description: Количество данных на странице
+        in: query
+        name: limit
+        type: integer
+      - description: Номер страницы
+        in: query
+        name: pages
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список продуктов
+          schema:
+            items:
+              $ref: '#/definitions/jewelrymodel.ProductPreview'
+            type: array
+        "400":
+          description: Некорректный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Неавторизованный доступ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Не найдено данных
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить все товары
+      tags:
+      - Product
+  /api/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о товаре по его ID (требуется авторизация)
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/jewelrymodel.ProductDetail'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить товар по ID
+      tags:
+      - Product
+  /api/product/by_category_id/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации об отфильтрованных товарах по категориям (требуется
+        авторизация)
+      parameters:
+      - description: ID Категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/jewelrymodel.ProductPreview'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить отфильтрованные товары по категориям
+      tags:
+      - Product
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Вход пользователя в систему
+      parameters:
+      - description: Учетные данные пользователя
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/jewelrymodel.LoginUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Аутентификация пользователя
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создание нового пользователя
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/jewelrymodel.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Регистрация пользователя
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

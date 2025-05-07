@@ -3,15 +3,25 @@ package main
 import (
 	"context"
 	jewelry "curs"
+	_ "curs/docs" // импортируйте сгенерированные документы
 	"curs/pkg/handler"
 	"curs/pkg/repository"
 	"curs/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	_ "github.com/swaggo/http-swagger" // http-swagger для Swagger UI
 	"os"
 	"os/signal"
 )
 
+// @title TODO APP Jewelry
+// @version 1.0
+// @description API Server
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 
 	logrus.SetFormatter(new(logrus.JSONFormatter))
