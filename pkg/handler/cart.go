@@ -201,7 +201,7 @@ func (h *Handler) UpdateItemCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
 		NewCustomError(w, http.StatusBadRequest, err.Error())
 		return
 	}

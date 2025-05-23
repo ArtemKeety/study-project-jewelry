@@ -90,6 +90,11 @@ definitions:
       type_product:
         type: integer
     type: object
+  jewelrymodel.TokenStruct:
+    properties:
+      token:
+        type: string
+    type: object
   jewelrymodel.User:
     properties:
       age:
@@ -541,6 +546,48 @@ paths:
       summary: Получить отфильтрованные товары по категориям
       tags:
       - Product
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Обновляет пару access/refresh токенов по валидному refresh-токену.
+        refresh-токен должен быть получен при предыдущей аутентификации.
+      parameters:
+      - description: Refresh токен в формате JSON
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/jewelrymodel.TokenStruct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ с новой парой токенов
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Невалидный запрос или формат данных
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Невалидный или просроченный refresh-токен
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление токенов доступа
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:

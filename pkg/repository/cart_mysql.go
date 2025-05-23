@@ -18,6 +18,7 @@ func (r *CartMysql) AddInCart(productId, userId int) (int, error) {
 	query := `INSERT INTO cart (tovar_id, user_id, count) VALUES (?, ?, ?)`
 
 	result, err := r.db.Exec(query, productId, userId, 1)
+	//result, err := r.db.ExecContext("", query, productId, userId, 1) // глунять про контекст
 
 	if err != nil {
 		return -1, err

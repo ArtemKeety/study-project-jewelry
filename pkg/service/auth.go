@@ -10,12 +10,17 @@ import (
 	"time"
 )
 
-const salt = "ARTEM363IVT"
-
 var jwtSecret = []byte("ARTEM363IVT")
+var jwtRefreshSecret = []byte("ARTEM_363_IVT")
 
 type Claims struct {
 	UserID int `json:"user_id"`
+	jwt.RegisteredClaims
+}
+
+type RefreshClaims struct {
+	Login  string `json:"login"`
+	UserID int    `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
@@ -40,18 +45,32 @@ func (s *AuthService) CreateUser(user jewelrymodel.User) (int, error) {
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) GenerateToken(login, password string) (string, error) {
+func (s *AuthService) GenerateToken(login, password string) (map[string]string, error) {
 	user, err := s.repo.GetUser(login)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if !checkPasswordHash(password, user.Password) {
-		return "", errors.New("invalid password or Email")
+		return nil, errors.New("invalid password or Email")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+		UserID: user.Id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(120 * time.Minute)), //time token
+			Issuer:    "Artem Medvedev",
+		},
+	})
+
+	signedToken, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign the token: %v", err)
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &RefreshClaims{
+		Login:  login,
 		UserID: user.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), //time token
@@ -59,12 +78,20 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 		},
 	})
 
-	signedToken, err := token.SignedString(jwtSecret)
+	signedRefreshToken, err := refreshToken.SignedString(jwtRefreshSecret)
 	if err != nil {
-		return "", fmt.Errorf("failed to sign the token: %v", err)
+		return nil, fmt.Errorf("failed to sign the token: %v", err)
 	}
 
-	return signedToken, nil
+	if err = s.repo.UpdateRefreshToken(signedRefreshToken, user.Id); err != nil {
+		return nil, err
+	}
+
+	data := make(map[string]string)
+	data["access_token"] = signedToken
+	data["refresh_token"] = signedRefreshToken
+
+	return data, nil
 }
 
 func (s *AuthService) ParseToken(tokenString string) (int, error) {
@@ -86,6 +113,73 @@ func (s *AuthService) ParseToken(tokenString string) (int, error) {
 	}
 
 	return claims.UserID, nil
+}
+
+func (s *AuthService) ParseRefreshToken(tokenString string) (jewelrymodel.User, error) {
+
+	token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtRefreshSecret, nil
+	})
+
+	var user jewelrymodel.User
+
+	if err != nil {
+		return user, fmt.Errorf("error parsing token: %v", err)
+	}
+
+	claims, ok := token.Claims.(*RefreshClaims)
+	if !ok || !token.Valid {
+		return user, errors.New("invalid token")
+	}
+
+	user, err = s.repo.GetUser(claims.Login)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (s *AuthService) ReGenerateToken(user jewelrymodel.User) (map[string]string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+		UserID: user.Id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(120 * time.Minute)), //time token
+			Issuer:    "Artem Medvedev",
+		},
+	})
+
+	signedToken, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign the token: %v", err)
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &RefreshClaims{
+		Login:  user.Login,
+		UserID: user.Id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), //time token
+			Issuer:    "Artem Medvedev",
+		},
+	})
+
+	signedRefreshToken, err := refreshToken.SignedString(jwtRefreshSecret)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign the token: %v", err)
+	}
+
+	if err = s.repo.UpdateRefreshToken(signedRefreshToken, user.Id); err != nil {
+		return nil, err
+	}
+
+	data := make(map[string]string)
+	data["access_token"] = signedToken
+	data["refresh_token"] = signedRefreshToken
+
+	return data, nil
 }
 
 func HashPassword(password string) string {

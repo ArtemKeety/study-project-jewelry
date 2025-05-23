@@ -8,6 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user jewelrymodel.User) (int, error)
 	GetUser(login string) (jewelrymodel.User, error)
+	UpdateRefreshToken(RefreshToken string, userId int) error
 }
 
 type Product interface {

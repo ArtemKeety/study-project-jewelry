@@ -7,8 +7,10 @@ import (
 
 type Authorization interface {
 	CreateUser(user jewelrymodel.User) (int, error)
-	GenerateToken(login, password string) (string, error)
+	GenerateToken(login, password string) (map[string]string, error)
 	ParseToken(tokenString string) (int, error)
+	ParseRefreshToken(tokenString string) (jewelrymodel.User, error)
+	ReGenerateToken(user jewelrymodel.User) (map[string]string, error)
 }
 
 type Product interface {

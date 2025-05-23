@@ -22,9 +22,9 @@ func NewAuthMysql(db *sql.DB) *AuthMysql {
 }
 
 func (r *AuthMysql) CreateUser(user jewelrymodel.User) (int, error) {
-	query := `INSERT INTO user (login, password, first_name, last_name, email, age) VALUES (?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO user (login, password, first_name, last_name, email, age, refresh) VALUES (?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := r.db.Exec(query, user.Login, user.Password, user.FirstName, user.LastName, user.Email, user.Age)
+	result, err := r.db.Exec(query, user.Login, user.Password, user.FirstName, user.LastName, user.Email, user.Age, "")
 	if err != nil {
 		return 0, err
 	}
@@ -39,10 +39,21 @@ func (r *AuthMysql) CreateUser(user jewelrymodel.User) (int, error) {
 
 func (r *AuthMysql) GetUser(login string) (jewelrymodel.User, error) {
 	var user jewelrymodel.User
-	query := `SELECT * FROM user WHERE login=?`
+	query := `SELECT id, login, password, first_name,
+       		last_name, father_name,
+       		age, email, phone_number
+			FROM user WHERE login=?`
 	row := r.db.QueryRow(query, login)
 	err := row.Scan(
 		&user.Id, &user.Login, &user.Password, &user.FirstName, &user.LastName, &user.FatherName,
 		&user.Age, &user.Email, &user.PhoneNumber)
 	return user, err
+}
+
+func (r *AuthMysql) UpdateRefreshToken(RefreshToken string, userId int) error {
+	query := `UPDATE user SET refresh = ? WHERE id = ?`
+	if _, err := r.db.Exec(query, RefreshToken, userId); err != nil {
+		return err
+	}
+	return nil
 }
